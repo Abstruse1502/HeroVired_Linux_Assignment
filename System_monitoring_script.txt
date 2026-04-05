@@ -1,0 +1,29 @@
+#Create a Script file
+sudo nano /usr/local/bin/monitor-resources.sh
+#!/bin/bash
+LOG_FILE="/var/log/system_monitor.log"
+INTERVAL=60          # seconds between samples
+
+mkdir -p "$(dirname "$LOG_FILE")"
+
+while true; do
+    echo "=== $(date) ===" >> "$LOG_FILE"
+
+    # CPU and memory snapshot (top 5 lines)
+    top -b -n1 | head -5 >> "$LOG_FILE"
+
+    # Top 5 CPU intensive processes
+    echo "Top CPU:" >> "$LOG_FILE"
+    ps aux --sort=-%cpu | head -6 >> "$LOG_FILE"
+
+    # Top 5 memory intensive processes
+    echo "Top Memory:" >> "$LOG_FILE"
+    ps aux --sort=-%mem | head -6 >> "$LOG_FILE"
+
+    # Disk usage snapshot
+    echo "Disk usage:" >> "$LOG_FILE"
+    df -h | head -5 >> "$LOG_FILE"
+
+    echo "" >> "$LOG_FILE"
+    sleep "$INTERVAL"
+done
